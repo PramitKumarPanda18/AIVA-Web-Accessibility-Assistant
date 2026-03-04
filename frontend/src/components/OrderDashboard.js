@@ -25,6 +25,7 @@ import {
 
 import CreateOrderWizard from './CreateOrderWizard';
 import VoiceOrderAssistant from './VoiceOrderAssistant';
+import { API_BASE_URL } from '../services/api';
 // import useResizeObserverFix from '../hooks/useResizeObserverFix';
 
 // ResizeObserver errors are handled globally by errorSuppression utility
@@ -1152,7 +1153,7 @@ const OrderDashboard = ({ addNotification }) => {
                         setScanImage(base64Data);
                         setScanLoading(true);
                         try {
-                          const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+                          const apiUrl = API_BASE_URL;
                           const resp = await fetch(`${apiUrl}/api/scan-image`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },

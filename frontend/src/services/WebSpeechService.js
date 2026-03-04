@@ -7,10 +7,11 @@
  */
 
 import axios from 'axios';
+import { API_BASE_URL } from './api';
 
 class WebSpeechService {
     constructor() {
-        this.baseUrl = '/api/voice/conversation';
+        this.baseUrl = `${API_BASE_URL}/api/voice/conversation`;
         this.conversationId = null;
         this.isListening = false;
         this._isProcessing = false;

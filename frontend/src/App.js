@@ -95,7 +95,10 @@ function AppContent() {
 
     const connectWebSocket = () => {
       try {
-        const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:8000';
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+        const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
+        const wsDomain = apiUrl.replace(/^https?:\/\//, '');
+        const wsUrl = process.env.REACT_APP_WS_URL || `${wsProtocol}://${wsDomain}`;
         ws = new WebSocket(`${wsUrl}/ws`);
 
         ws.onopen = () => {

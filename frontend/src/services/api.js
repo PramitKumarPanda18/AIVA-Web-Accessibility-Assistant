@@ -2,7 +2,7 @@
  * API service for AIVA System
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 class APIService {
   async request(endpoint, options = {}) {
@@ -144,7 +144,9 @@ class WebSocketService {
 
   connect() {
     try {
-      const wsUrl = `ws://localhost:8000/ws`;
+      const wsProtocol = API_BASE_URL.startsWith('https') ? 'wss' : 'ws';
+      const wsDomain = API_BASE_URL.replace(/^https?:\/\//, '');
+      const wsUrl = `${wsProtocol}://${wsDomain}/ws`;
       this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = () => {
