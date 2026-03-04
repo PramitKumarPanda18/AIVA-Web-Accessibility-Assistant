@@ -1,0 +1,61 @@
+# Root level .gitignore
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# Logs
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+env/
+.venv/
+
+# Node
+node_modules/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+postgres_data/
+
+# Session replays and recordings
+session-replays/
+session-recordings/
+screenshots/
+
+# Media files
+*.mp4
+*.webm
+*.pcm
+*.wav
+
+# Documentation builds
+docs/_build/

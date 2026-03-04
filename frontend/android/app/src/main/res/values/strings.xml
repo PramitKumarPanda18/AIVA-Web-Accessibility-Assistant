@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AIVA</string>
+    <string name="title_activity_main">AIVA</string>
+    <string name="package_name">io.aiva.navigator</string>
+    <string name="custom_url_scheme">io.aiva.navigator</string>
+</resources>
