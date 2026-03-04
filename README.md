@@ -104,87 +104,63 @@ AIVA (AI-Integrated Voice Assistant) is a production-ready, AI-powered e-commerc
 ## 🏗️ System Architecture
 
 ### High-Level Architecture
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                          Frontend (React 18 + AWS Cloudscape)                │
-│                                                                              │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────────┐   │
-│  │                  │  │                  │  │                          │   │
-│  │    Dashboard     │  │   Live Browser   │  │    Voice Assistant       │   │
-│  │   (Order Fleet   │  │     Viewer       │  │   (Emotion Sensing +     │   │
-│  │    Tracker)      │  │                  │  │    Haptic Halo +         │   │
-│  │                  │  │                  │  │    Line Magnifier)       │   │
-│  └──────────────────┘  └──────────────────┘  └──────────────────────────┘   │
-│           │                     │                         │                  │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────────┐   │
-│  │  Accessibility   │  │  Shopping DNA    │  │     Secret Vault         │   │
-│  │   Scoreboard     │  │    Profiler      │  │    (Credential Mgr)      │   │
-│  └──────────────────┘  └──────────────────┘  └──────────────────────────┘   │
-│           │                     │                         │                  │
-│           └─────────────────────┴─────────────────────────┘                  │
-│                                 │                                            │
-└─────────────────────────────────┼────────────────────────────────────────────┘
-                                  │
-                          HTTP / WebSocket
-                                  │
-┌─────────────────────────────────┼────────────────────────────────────────────┐
-│                        Backend (FastAPI + Uvicorn)                           │
-│                                                                              │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────────┐   │
-│  │                  │  │                  │  │                          │   │
-│  │    REST API      │  │    WebSocket     │  │     Order Queue          │   │
-│  │   Endpoints      │  │     Server       │  │      Manager             │   │
-│  │   (40+ routes)   │  │  (sub-50ms)      │  │   (Priority-based)      │   │
-│  │                  │  │                  │  │                          │   │
-│  └──────────────────┘  └──────────────────┘  └──────────────────────────┘   │
-│           │                     │                         │                  │
-│           └─────────────────────┴─────────────────────────┘                  │
-│                                 │                                            │
-│  ┌──────────────────────────────┴───────────────────────────────────────┐    │
-│  │                     Core Services Layer                              │    │
-│  │                                                                      │    │
-│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────┐    │    │
-│  │  │               │  │               │  │                       │    │    │
-│  │  │    Voice      │  │   Browser     │  │     Settings          │    │    │
-│  │  │   Service     │  │   Service     │  │      Service          │    │    │
-│  │  │ (Nova Sonic)  │  │ (AgentCore)   │  │  (Configuration)     │    │    │
-│  │  │               │  │               │  │                       │    │    │
-│  │  └───────────────┘  └───────────────┘  └───────────────────────┘    │    │
-│  │                                                                      │    │
-│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────┐    │    │
-│  │  │               │  │               │  │                       │    │    │
-│  │  │   Secrets     │  │  Database     │  │     Translation       │    │    │
-│  │  │   Manager     │  │  Manager      │  │      Service          │    │    │
-│  │  │  (Encrypted)  │  │ (SQLAlchemy)  │  │   (Nova Lite)        │    │    │
-│  │  │               │  │               │  │                       │    │    │
-│  │  └───────────────┘  └───────────────┘  └───────────────────────┘    │    │
-│  │                                                                      │    │
-│  └──────────────────────────────────────────────────────────────────────┘    │
-│                                 │                                            │
-│  ┌──────────────────────────────┴───────────────────────────────────────┐    │
-│  │                     AI Agent Layer                                   │    │
-│  │                                                                      │    │
-│  │  ┌─────────────────────────┐     ┌─────────────────────────────┐    │    │
-│  │  │                         │     │                             │    │    │
-│  │  │     Strands Agent       │     │     Nova Act Agent          │    │    │
-│  │  │  (MCP + Playwright)     │     │  (Vision + Browser Worker)  │    │    │
-│  │  │                         │     │                             │    │    │
-│  │  └─────────────────────────┘     └─────────────────────────────┘    │    │
-│  │                                                                      │    │
-│  └──────────────────────────────────────────────────────────────────────┘    │
-│                                                                              │
-└──────────────────────────────────┬───────────────────────────────────────────┘
-                                   │
-           ┌───────────────────────┼───────────────────────┐
-           │                       │                       │
-┌──────────▼──────────┐  ┌────────▼─────────┐  ┌──────────▼──────────┐
-│                     │  │                  │  │                     │
-│    AWS Bedrock      │  │   SQLite /       │  │     AWS S3          │
-│   (Claude 3.5,      │  │  PostgreSQL      │  │  (Session Replays,  │
-│    Nova Lite,       │  │   Database       │  │   Screenshots,      │
-│    Nova Sonic)      │  │                  │  │   HAR Audit Logs)   │
-│                     │  │                  │  │                     │
-└─────────────────────┘  └──────────────────┘  └─────────────────────┘
+
+```mermaid
+graph TD
+
+    %% SENSORY LAYER
+    User_Voice[User Voice / Emotion] 
+    React_Dashboard[React 18 Dashboard]
+    WebAudio_Sensor[WebAudio API FFT Sensor]
+    Haptic_Visuals[Haptic Halo & Dynamic Magnifier]
+    
+    User_Voice --> |Audio Stream| React_Dashboard
+    React_Dashboard --> |Processes Frequencies| WebAudio_Sensor
+    React_Dashboard --> |Provides Cues| Haptic_Visuals
+
+    %% API GATEWAY LAYER
+    API_Gateway[Amazon API Gateway]
+    WebSocket_Server[FastAPI WebSocket Router]
+    Lambda_Core[AWS Lambda / ECS Core Handlers]
+
+    React_Dashboard --> |REST Calls| API_Gateway
+    React_Dashboard <--> |Sub-50ms Telemetry| WebSocket_Server
+    API_Gateway --> Lambda_Core
+
+    %% AI REASONING LAYER (AWS BEDROCK)
+    Bedrock_Runtime[Amazon Bedrock Engine]
+    Nova_Lite[Amazon Nova Lite: Multilingual Translation]
+    Claude_Sonnet[Anthropic Claude 3.5 Sonnet: Intent Parsing]
+    Nova_Sonic[Amazon Nova Sonic: Text-to-Speech]
+
+    Lambda_Core --> |Auth & Trigger| Bedrock_Runtime
+    Bedrock_Runtime --> |Translates Hindi/Spanish| Nova_Lite
+    Bedrock_Runtime --> |Extracts JSON Order Data| Claude_Sonnet
+    Bedrock_Runtime --> |Generates Empathetic Audio| Nova_Sonic
+
+    %% EXECUTION & AUTOMATION LAYER
+    Task_Queue[Redis / Amazon SQS Order Queue]
+    AgentCore_Engine[AgentCore Vision Strategy]
+    Headless_Browser[Playwright Ephemeral Environment]
+    Retailer_Target[(Amazon / Walmart / Target)]
+
+    Claude_Sonnet --> |Passes Validated Schema| Task_Queue
+    Task_Queue --> AgentCore_Engine
+    AgentCore_Engine --> |Compiles DOM Scripts| Headless_Browser
+    Headless_Browser --> |Simulated Clicks/Keystrokes| Retailer_Target
+
+    %% PERSISTENCE & SECURITY
+    Secrets_Manager[AWS Secrets Manager]
+    DynamoDB[Amazon DynamoDB: Order State]
+    S3_Bucket[Amazon S3: Session Replays & Har Logs]
+
+    Lambda_Core <--> |Decrypts Auth Tokens| Secrets_Manager
+    Lambda_Core <--> |Writes State| DynamoDB
+    Headless_Browser --> |Uploads Audit Trail| S3_Bucket
+    
+    %% FEEDBACK LOOP
+    Retailer_Target --> |DOM Changes| Headless_Browser
+    Headless_Browser --> |Status Ticks| WebSocket_Server
 ```
 
 ### Component Architecture
@@ -1046,4 +1022,4 @@ Digital inclusion is not a feature. It is a fundamental human right. AIVA ensure
 
 ---
 
-Built with ❤️ using AWS Bedrock, Claude AI, Amazon Nova, and Modern Web Technologies
+Built with ❤️ on AWS for the AI Bharat Hackathon 2026.
