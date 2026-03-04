@@ -1,56 +1,65 @@
-# 🤖 AIVA - Web Accessibility Assistant
+# 🧬 AIVA: AI-Integrated Voice Assistant
+### *Bridging the Accessibility Gap in Global E-Commerce*
 
-**AIVA (AI-powered Voice Assistant)** is a high-performance, AI-driven e-commerce automation tool designed to make online shopping as easy as talking. It features a stunning premium dark-mode interface and a state-of-the-art Voice Assistant.
-
----
-
-## ✨ New in this Version: Improved Voice Agent
-*   **🧠 Persistent Context**: The Voice Assistant now remembers your full conversation. It won't forget your product if you suddenly change the quantity.
-*   **🌐 Live Preview**: Automatically opens a new browser tab with the retailer's website as soon as you confirm an order.
-*   **🛒 Amazon Grocery Support**: Dedicated support for Amazon Fresh/Grocery shopping.
-*   **🎙️ 100% Free Voice Logic**: Uses your browser's native **Web Speech API**. No expensive AWS credits required for speech recognition!
-*   **💎 Premium Aesthetics**: Overhauled dashboard with deep-dark gradients and glassmorphism UI.
+**AIVA** (AI-Integrated Voice Assistant) is a next-generation shopping platform designed to empower elderly users and individuals with disabilities. It transforms the often-frustrating experience of online shopping into a natural, empathetic, and fully voice-driven conversation.
 
 ---
 
-## 🚀 Quick Start
+## 🌟 Why AIVA is Unique?
+AIVA isn't just another voice tool; it’s an **Inclusive Ecosystem** built on four revolutionary pillars:
 
-### 1. Backend Setup
-```bash
-cd backend
-# Recommended: Use uv for fastest setup
-uv sync
-uv run app.py
-```
-*The backend runs on `http://localhost:8000`*
-
-### 2. Frontend Setup
-```bash
-cd frontend
-npm install
-npm start
-```
-*The frontend runs on `http://localhost:3000`*
+1.  **🎭 Proactive Emotional Empathy:** 
+    Using the **Web Audio API**, AIVA analyzes the user's vocal frequencies in real-time. If it detects frustration, stress, or confusion, it automatically simplifies the interface and relaxes its tone to guide the user.
+2.  **📊 Retailer Accessibility Scoreboard (World First!):** 
+    Not all shops are built equal. AIVA maintains a live ranking of major retailers (Amazon, Target, Walmart) based on their "AI-Readability," directing users toward platforms that respect their accessibility needs.
+3.  **🌍 Translation-First Architecture:** 
+    Elderly users often prefer their mother tongue. Our **Live Translation Layer** allows users to speak in Hindi, Spanish, or French, while AIVA handles the complex English-based ordering backend seamlessly.
+4.  **🧤 Multi-Sensory Feedback:** 
+    Designed for the hearing and visually impaired, featuring a **"Haptic Halo"** (visual sound indicator) and **Dynamic Focal Zoom** (automatically magnifying sections of the page as the user speaks about them).
 
 ---
 
-## 🎧 Using the Voice Assistant
-1. Ensure your browser (Chrome/Edge recommended) has microphone permissions.
-2. Click the **Microphone Icon** on the dashboard.
-3. State your product: *"I want to buy Airpods"*.
-4. State quantity: *"5"*.
-5. State store: *"Amazon Grocery"*.
-6. Say **"Yes"** to confirm. The assistant will open the store tab and sync the data to your dashboard!
+## 🛠️ How it Works
+AIVA acts as a sophisticated bridge between the user and the chaotic world of the web:
+1.  **Voice Input:** Captured via the Web Speech API and analyzed for emotional sentiment.
+2.  **Intelligent Processing:** Non-English speech is translated on-the-fly via **Amazon Nova**.
+3.  **Reasoning:** The requested action is parsed by **Anthropic Claude 3.5** (via Amazon Bedrock) into structured automation steps.
+4.  **Task Execution:** AIVA's headless browser engine executes the clicks and navigation on real retailer websites, shielding the user from complex UI.
 
 ---
 
-## 📂 Project Structure
-- **/frontend**: React application with Cloudscape UI.
-- **/backend**: FastAPI server for order management and queueing.
-- **walkthrough.md**: Detailed step-by-step setup guide.
-- **requirements.md**: Technical prerequisites.
+## ☁️ Powered by AWS Technology
+AIVA leverages the cutting-edge power of **Amazon Bedrock** to deliver a "Production-Ready" feel:
+-   **Amazon Nova (Lite/Pro):** Powers our high-speed Multilingual Translation and real-time reasoning.
+-   **Anthropic Claude 3.5 Sonnet:** The "Brain" that handles complex shopping logic and decision-making.
+-   **AWS Bedrock API:** Provides a unified, secure, and scalable interface for all our Generative AI needs.
+-   **AWS Infrastructure:** Designed for the cloud, ready to be deployed via Render/Vercel with full environment isolation.
 
 ---
 
-## 📜 License
-Apache-2.0
+## 🚀 Getting Started
+### Prerequisites
+- Node.js & NPM
+- Python 3.10+
+- AWS Credentials (for Bedrock access)
+
+### Installation
+1.  **Frontend:**
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
+2.  **Backend:**
+    ```bash
+    cd backend
+    pip install -r requirements.txt
+    uvicorn app:app --reload
+    ```
+
+---
+
+## 🏆 Hackathon Entry
+Developed for the **AI Bharat Hackathon**, AIVA represents a commitment to digital inclusion—ensuring that the AI revolution leaves no one behind, regardless of physical ability, age, or language.
+
+**Built with ❤️ for the global accessibility community.**
