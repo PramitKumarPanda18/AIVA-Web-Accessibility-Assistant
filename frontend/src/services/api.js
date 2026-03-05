@@ -2,7 +2,10 @@
  * API service for AIVA System
  */
 
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// Automatically use the Render backend in production (e.g. Amplify) and localhost in development
+export const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://aiva-backend-bxr4.onrender.com'
+  : (process.env.REACT_APP_API_URL || 'http://localhost:8000');
 
 class APIService {
   async request(endpoint, options = {}) {
