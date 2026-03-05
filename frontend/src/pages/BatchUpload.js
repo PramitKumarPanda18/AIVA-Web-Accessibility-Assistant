@@ -24,6 +24,7 @@ import {
   Link
 } from '@cloudscape-design/components';
 import ModelSelector from '../components/ModelSelector';
+import { API_BASE_URL } from '../services/api';
 
 const BatchUpload = ({ addNotification }) => {
   const navigate = useNavigate();
@@ -377,7 +378,7 @@ const BatchUpload = ({ addNotification }) => {
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 200);
 
-      const response = await fetch('/api/orders/upload-csv', {
+      const response = await fetch(`${API_BASE_URL}/api/orders/upload-csv`, {
         method: 'POST',
         body: formData
       });
@@ -451,7 +452,7 @@ const BatchUpload = ({ addNotification }) => {
 
   const downloadSampleCSV = () => {
     const link = document.createElement('a');
-    link.href = '/sample-orders.csv';
+    link.href = `${API_BASE_URL}/sample-orders.csv`;
     link.download = 'sample-orders.csv';
     document.body.appendChild(link);
     link.click();

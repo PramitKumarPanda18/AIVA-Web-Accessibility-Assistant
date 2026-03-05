@@ -14,6 +14,7 @@ import {
 } from '@cloudscape-design/components';
 
 import ModelSelector from './ModelSelector';
+import { API_BASE_URL } from '../services/api';
 
 const CreateOrderWizard = ({ visible, onDismiss, onSubmit, addNotification }) => {
   const [activeStepIndex, setActiveStepIndex] = useState(0);
@@ -59,7 +60,7 @@ const CreateOrderWizard = ({ visible, onDismiss, onSubmit, addNotification }) =>
   const fetchRetailers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/config/retailers');
+      const response = await fetch(`${API_BASE_URL}/api/config/retailers`);
       if (response.ok) {
         const data = await response.json();
         setRetailers(data.retailer_configs || {});
@@ -173,7 +174,7 @@ const CreateOrderWizard = ({ visible, onDismiss, onSubmit, addNotification }) =>
 
     setSubmitting(true);
     try {
-      const response = await fetch('/api/orders', {
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

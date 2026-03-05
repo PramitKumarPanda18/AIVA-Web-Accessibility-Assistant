@@ -66,9 +66,9 @@ const OrderDashboard = ({ addNotification }) => {
 
     try {
       const [ordersRes, retailersRes, queueRes] = await Promise.all([
-        fetch('/api/orders?limit=500'),
-        fetch('/api/config/retailers'),
-        fetch('/api/queue/status')
+        fetch(`${API_BASE_URL}/api/orders?limit=500`),
+        fetch(`${API_BASE_URL}/api/config/retailers`),
+        fetch(`${API_BASE_URL}/api/queue/status/`)
       ]);
 
       if (!ordersRes.ok || !retailersRes.ok || !queueRes.ok) {
@@ -130,7 +130,7 @@ const OrderDashboard = ({ addNotification }) => {
 
   const handleQueuePause = async () => {
     try {
-      const response = await fetch('/api/queue/pause', { method: 'POST' });
+      const response = await fetch(`${API_BASE_URL}/api/queue/pause`, { method: 'POST' });
 
       if (!response.ok) {
         throw new Error('Failed to pause queue');
@@ -156,7 +156,7 @@ const OrderDashboard = ({ addNotification }) => {
 
   const handleQueueResume = async () => {
     try {
-      const response = await fetch('/api/queue/resume', { method: 'POST' });
+      const response = await fetch(`${API_BASE_URL}/api/queue/resume`, { method: 'POST' });
 
       if (!response.ok) {
         throw new Error('Failed to resume queue');
@@ -182,7 +182,7 @@ const OrderDashboard = ({ addNotification }) => {
 
   const handleDeleteCompleted = async () => {
     try {
-      const response = await fetch('/api/orders/cleanup/completed', { method: 'DELETE' });
+      const response = await fetch(`${API_BASE_URL}/api/orders/cleanup/completed`, { method: 'DELETE' });
 
       if (!response.ok) {
         throw new Error('Failed to delete completed orders');
@@ -1100,7 +1100,7 @@ const OrderDashboard = ({ addNotification }) => {
                           },
                           instructions: 'Order placed via Scan to Order AI Vision feature'
                         };
-                        const resp = await fetch('/api/orders', {
+                        const resp = await fetch(`${API_BASE_URL}/api/orders`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify(orderPayload)

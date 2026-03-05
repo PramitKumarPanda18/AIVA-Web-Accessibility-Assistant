@@ -12,6 +12,7 @@ import {
   Link,
   Alert
 } from '@cloudscape-design/components';
+import { API_BASE_URL } from '../services/api';
 
 const ReviewQueue = ({ addNotification }) => {
   const [reviewItems, setReviewItems] = useState([]);
@@ -37,7 +38,7 @@ const ReviewQueue = ({ addNotification }) => {
     }
 
     try {
-      const response = await fetch('/api/review/queue');
+      const response = await fetch(`${API_BASE_URL}/api/review/queue`);
       if (!response.ok) {
         throw new Error('Failed to fetch review queue');
       }
@@ -140,7 +141,7 @@ const ReviewQueue = ({ addNotification }) => {
     setCompletingReviews(true);
     try {
       const promises = selectedItems.map(item =>
-        fetch(`/api/review/${item.id}/resolve`, {
+        fetch(`${API_BASE_URL}/api/review/${item.id}/resolve`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

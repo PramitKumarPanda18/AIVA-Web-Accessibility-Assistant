@@ -324,7 +324,14 @@ app = FastAPI(
 )
 
 # CORS middleware - configure based on environment
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
+env_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
+default_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://main.d1awa3ipd7jcr2.amplifyapp.com"
+]
+allowed_origins = list(set([o.strip() for o in env_origins + default_origins if o.strip()]))
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

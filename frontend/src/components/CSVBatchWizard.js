@@ -15,6 +15,7 @@ import {
   ProgressBar
 } from '@cloudscape-design/components';
 import ModelSelector from './ModelSelector';
+import { API_BASE_URL } from '../services/api';
 
 const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -33,7 +34,7 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
 
   const handleFileChange = async ({ detail }) => {
     setUploadFile(detail.value);
-    
+
     if (detail.value && detail.value.length > 0) {
       // Preview CSV file
       try {
@@ -42,7 +43,7 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
         const lines = text.split('\n').slice(0, 6); // First 5 rows + header
         const preview = lines.map(line => line.split(',').slice(0, 4)); // First 4 columns
         setCsvPreview(preview);
-        
+
         // Basic validation
         const totalLines = text.split('\n').length - 1; // Exclude header
         setValidationResults({
@@ -88,7 +89,7 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 200);
 
-      const response = await fetch('/api/orders/upload-csv', {
+      const response = await fetch(`${API_BASE_URL}/api/orders/upload-csv`, {
         method: 'POST',
         body: formData
       });
@@ -139,7 +140,7 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
 
   const downloadSampleCSV = () => {
     const link = document.createElement('a');
-    link.href = '/sample-orders.csv';
+    link.href = `${API_BASE_URL}/sample-orders.csv`;
     link.download = 'sample-orders.csv';
     document.body.appendChild(link);
     link.click();
@@ -149,7 +150,7 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
   const renderStep1 = () => (
     <SpaceBetween size="l">
       <Header variant="h3">Upload CSV File</Header>
-      
+
       <Alert type="info">
         <Box>
           <strong>Required fields:</strong> name, curateditem_url
@@ -219,8 +220,8 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
                   {csvPreview.map((row, index) => (
                     <tr key={index} style={{ borderBottom: '1px solid #e9ebed' }}>
                       {row.map((cell, cellIndex) => (
-                        <td key={cellIndex} style={{ 
-                          padding: '8px', 
+                        <td key={cellIndex} style={{
+                          padding: '8px',
                           fontSize: '12px',
                           maxWidth: '150px',
                           overflow: 'hidden',
@@ -245,7 +246,7 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
   const renderStep2 = () => (
     <SpaceBetween size="l">
       <Header variant="h3">Configure Automation Settings</Header>
-      
+
       <Alert type="info">
         These settings will be applied to all orders created from the CSV file.
       </Alert>
@@ -295,7 +296,7 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
   const renderStep3 = () => (
     <SpaceBetween size="l">
       <Header variant="h3">Review and Upload</Header>
-      
+
       <Container>
         <SpaceBetween size="m">
           <Header variant="h4">Upload Summary</Header>
@@ -334,7 +335,7 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
       )}
 
       <Alert type="warning">
-        <strong>Important:</strong> This will create {validationResults?.totalRows} orders in your system. 
+        <strong>Important:</strong> This will create {validationResults?.totalRows} orders in your system.
         Make sure your automation settings are correct before proceeding.
       </Alert>
     </SpaceBetween>
@@ -380,8 +381,8 @@ const CSVBatchWizard = ({ visible, onDismiss, onOrdersCreated, addNotification }
               </Button>
             )}
             {currentStep < 3 ? (
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 onClick={handleNext}
                 disabled={!canProceed() || uploading}
               >

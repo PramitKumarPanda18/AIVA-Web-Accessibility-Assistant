@@ -262,7 +262,7 @@ class WebSpeechService {
             if (isNonEnglish) {
                 console.log(`[Voice] Translating user text from ${this.currentLanguage} to English...`);
                 // Translate user's native language TO English for the backend
-                const transRes = await axios.post('/api/translate', {
+                const transRes = await axios.post(`${API_BASE_URL}/api/translate`, {
                     text: transcript,
                     target_language: 'en'
                 });
@@ -285,7 +285,7 @@ class WebSpeechService {
             // HACKATHON: Translate AI English response BACK to user's native language
             if (isNonEnglish && assistantText) {
                 console.log(`[Voice] Translating AI response to ${this.currentLanguage}...`);
-                const aiTransRes = await axios.post('/api/translate', {
+                const aiTransRes = await axios.post(`${API_BASE_URL}/api/translate`, {
                     text: assistantText,
                     target_language: this.currentLanguage
                 });

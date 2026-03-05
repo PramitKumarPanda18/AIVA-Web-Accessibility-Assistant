@@ -13,6 +13,7 @@ import {
   Box,
   TextContent
 } from '@cloudscape-design/components';
+import { API_BASE_URL } from '../services/api';
 
 const SecretVault = ({ addNotification }) => {
   const [secrets, setSecrets] = useState([]);
@@ -34,7 +35,7 @@ const SecretVault = ({ addNotification }) => {
   const fetchSecrets = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/secrets');
+      const response = await fetch(`${API_BASE_URL}/api/secrets`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch secrets: ${response.status} ${errorText}`);
@@ -83,7 +84,7 @@ const SecretVault = ({ addNotification }) => {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch('/api/secrets', {
+      const response = await fetch(`${API_BASE_URL}/api/secrets`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +124,7 @@ const SecretVault = ({ addNotification }) => {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch(`/api/secrets/${editingSecret.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/secrets/${editingSecret.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -156,7 +157,7 @@ const SecretVault = ({ addNotification }) => {
   const handleDelete = async () => {
     try {
       const promises = selectedItems.map(item =>
-        fetch(`/api/secrets/${item.id}`, { method: 'DELETE' })
+        fetch(`${API_BASE_URL}/api/secrets/${item.id}`, { method: 'DELETE' })
       );
 
       await Promise.all(promises);

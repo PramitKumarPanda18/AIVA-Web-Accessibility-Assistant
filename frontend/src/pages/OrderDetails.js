@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { wsService } from '../services/api';
+import { wsService, API_BASE_URL } from '../services/api';
 import {
   Header,
   SpaceBetween,
@@ -43,7 +43,7 @@ const OrderDetails = ({ addNotification }) => {
   const fetchOrder = useCallback(async () => {
     try {
       setError(null);
-      const response = await fetch(`/api/orders/${orderId}`);
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -163,7 +163,7 @@ const OrderDetails = ({ addNotification }) => {
 
   const handleCancelOrder = async () => {
     try {
-      const response = await fetch(`/api/orders/${orderId}/cancel`, { method: 'POST' });
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/cancel`, { method: 'POST' });
 
       if (!response.ok) {
         throw new Error('Failed to cancel order');
@@ -189,7 +189,7 @@ const OrderDetails = ({ addNotification }) => {
   const handleTakeControl = async () => {
     setControlLoading(true);
     try {
-      const response = await fetch(`/api/orders/${orderId}/take-control`, { method: 'POST' });
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/take-control`, { method: 'POST' });
 
       if (!response.ok) {
         throw new Error('Failed to take manual control');
@@ -220,7 +220,7 @@ const OrderDetails = ({ addNotification }) => {
   const handleReleaseControl = async () => {
     setControlLoading(true);
     try {
-      const response = await fetch(`/api/orders/${orderId}/release-control`, { method: 'POST' });
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/release-control`, { method: 'POST' });
 
       if (!response.ok) {
         throw new Error('Failed to release manual control');
@@ -251,7 +251,7 @@ const OrderDetails = ({ addNotification }) => {
   const handleResumeNovaAct = async () => {
     setControlLoading(true);
     try {
-      const response = await fetch(`/api/orders/${orderId}/resume-nova-act`, { method: 'POST' });
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/resume-nova-act`, { method: 'POST' });
 
       if (!response.ok) {
         throw new Error('Failed to resume Nova Act');

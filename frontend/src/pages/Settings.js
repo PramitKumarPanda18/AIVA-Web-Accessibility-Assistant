@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { API_BASE_URL } from '../services/api';
 import {
   Container,
   Header,
@@ -47,7 +48,7 @@ const Settings = ({ addNotification }) => {
       setLoading(true);
 
       // Only load system config (fast)
-      const configResponse = await fetch('/api/settings/config');
+      const configResponse = await fetch(`${API_BASE_URL}/api/settings/config`);
       if (configResponse.ok) {
         const configData = await configResponse.json();
         const config = configData.config || {};
@@ -73,7 +74,7 @@ const Settings = ({ addNotification }) => {
 
     try {
       setIamLoading(true);
-      const response = await fetch('/api/settings/aws/search-iam-roles');
+      const response = await fetch(`${API_BASE_URL}/api/settings/aws/search-iam-roles`);
 
       if (response.ok) {
         const data = await response.json();
@@ -105,7 +106,7 @@ const Settings = ({ addNotification }) => {
 
     try {
       setS3Loading(true);
-      const response = await fetch('/api/settings/aws/search-s3-buckets');
+      const response = await fetch(`${API_BASE_URL}/api/settings/aws/search-s3-buckets`);
 
       if (response.ok) {
         const data = await response.json();
@@ -135,7 +136,7 @@ const Settings = ({ addNotification }) => {
   const loadRetailerUrls = useCallback(async () => {
     try {
       setUrlsLoading(true);
-      const response = await fetch('/api/config/retailer-urls');
+      const response = await fetch(`${API_BASE_URL}/api/config/retailer-urls`);
       if (response.ok) {
         const data = await response.json();
         setRetailerUrls(data.retailer_urls || []);
@@ -157,7 +158,7 @@ const Settings = ({ addNotification }) => {
       const method = editingUrl ? 'PUT' : 'POST';
       const url = editingUrl ? `/api/config/retailer-urls/${editingUrl.id}` : '/api/config/retailer-urls';
 
-      const response = await fetch(url, {
+      const response = await fetch(`${API_BASE_URL}${url}`, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(urlFormData)
@@ -187,7 +188,7 @@ const Settings = ({ addNotification }) => {
 
   const handleDeleteUrl = async (urlId) => {
     try {
-      const response = await fetch(`/api/config/retailer-urls/${urlId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/config/retailer-urls/${urlId}`, {
         method: 'DELETE'
       });
 
@@ -268,7 +269,7 @@ const Settings = ({ addNotification }) => {
         return;
       }
 
-      const response = await fetch('/api/settings/config', {
+      const response = await fetch(`${API_BASE_URL}/api/settings/config`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: systemConfig })
@@ -284,7 +285,7 @@ const Settings = ({ addNotification }) => {
       // Check for success - handle both status field and HTTP success
       if (response.ok && (result.status === 'success' || !result.status)) {
         // 저장 성공 후 DB에서 최신 설정을 다시 로드하여 동기화
-        const configResponse = await fetch('/api/settings/config');
+        const configResponse = await fetch(`${API_BASE_URL}/api/settings/config`);
         if (configResponse.ok) {
           const configData = await configResponse.json();
           const updatedConfig = configData.config || {};

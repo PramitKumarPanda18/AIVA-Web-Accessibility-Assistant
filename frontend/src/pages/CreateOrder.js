@@ -14,6 +14,7 @@ import {
   ExpandableSection
 } from '@cloudscape-design/components';
 import ModelSelector from '../components/ModelSelector';
+import { API_BASE_URL } from '../services/api';
 
 const CreateOrder = ({ addNotification }) => {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ const CreateOrder = ({ addNotification }) => {
   const fetchRetailerUrls = useCallback(async () => {
     try {
       setLoadingRetailers(true);
-      const response = await fetch('/api/config/retailer-urls');
+      const response = await fetch(`${API_BASE_URL}/api/config/retailer-urls`);
       if (response.ok) {
         const data = await response.json();
         setRetailerUrls(data.retailer_urls || []);
@@ -75,7 +76,7 @@ const CreateOrder = ({ addNotification }) => {
 
   const fetchSecrets = useCallback(async () => {
     try {
-      const response = await fetch('/api/secrets');
+      const response = await fetch(`${API_BASE_URL}/api/secrets`);
       if (response.ok) {
         const data = await response.json();
         setSecrets(data.secrets || []);
@@ -167,7 +168,7 @@ const CreateOrder = ({ addNotification }) => {
         instructions: formData.instructions || undefined
       };
 
-      const response = await fetch('/api/orders', {
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)

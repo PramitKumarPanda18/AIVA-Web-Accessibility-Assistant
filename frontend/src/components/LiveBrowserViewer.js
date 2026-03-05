@@ -9,6 +9,7 @@ import {
   SpaceBetween,
   Button
 } from '@cloudscape-design/components';
+import { API_BASE_URL } from '../services/api';
 import '@cloudscape-design/global-styles/index.css';
 
 const LiveBrowserViewer = ({ orderId }) => {
@@ -37,7 +38,7 @@ const LiveBrowserViewer = ({ orderId }) => {
 
         // Override URL constructor to force absolute paths for DCV worker files
         const originalURL = window.URL;
-        window.URL = function(url, base) {
+        window.URL = function (url, base) {
           // If this is a DCV worker file request, force it to use origin
           if (typeof url === 'string' && url.includes('dcv-sdk/dcvjs-umd/dcv/')) {
             console.log('Intercepting DCV worker URL:', url);
@@ -50,7 +51,7 @@ const LiveBrowserViewer = ({ orderId }) => {
           }
           return new originalURL(url, base);
         };
-        
+
         // Copy static properties
         Object.setPrototypeOf(window.URL, originalURL);
         Object.defineProperty(window.URL, 'prototype', {
@@ -64,40 +65,40 @@ const LiveBrowserViewer = ({ orderId }) => {
         dcvScript.type = 'text/javascript';
         dcvScript.onload = () => {
           console.log('DCV Web Client SDK loaded successfully');
-          
+
           // Restore original URL constructor
           window.URL = originalURL;
           console.log('Restored original URL constructor');
-          
+
           // Configure DCV worker path like in simple_browser_viewer.py
           window.dcvWorkerPath = window.location.origin + '/dcv-sdk/dcvjs-umd/dcv/';
           console.log('DCV worker path set to:', window.dcvWorkerPath);
-          
+
           // Set worker path immediately after loading with absolute URL
           if (window.dcv && window.dcv.setWorkerPath) {
             window.dcv.setWorkerPath(window.location.origin + '/dcv-sdk/dcvjs-umd/dcv/');
             console.log('DCV setWorkerPath called with absolute URL');
           }
-          
+
           // Also try setting baseUrl
           if (window.dcv && window.dcv.setBaseUrl) {
             window.dcv.setBaseUrl(window.location.origin + '/dcv-sdk/dcvjs-umd');
             console.log('DCV setBaseUrl called with absolute URL');
           }
-          
+
           // Log DCV SDK info for debugging
           if (window.dcv) {
             console.log('DCV SDK version:', window.dcv.version || 'Unknown');
             console.log('DCV SDK methods:', Object.keys(window.dcv));
           }
-          
+
           setDcvLoaded(true);
         };
         dcvScript.onerror = (err) => {
           console.error('Failed to load DCV Web Client SDK:', err);
           setError('Failed to load DCV SDK');
           setLoading(false);
-          
+
           // Restore original URL constructor on error
           window.URL = originalURL;
           console.log('Restored original URL constructor on error');
@@ -129,23 +130,23 @@ const LiveBrowserViewer = ({ orderId }) => {
         return;
       }
     }
-    
+
     console.log('dcv-display element found:', dcvElement);
-    
+
     // Set DCV worker path before connecting - use complete absolute URL
     const fullWorkerPath = window.location.origin + '/dcv-sdk/dcvjs-umd/dcv/';
     const fullBaseUrl = window.location.origin + '/dcv-sdk/dcvjs-umd';
-    
+
     if (window.dcv && window.dcv.setWorkerPath) {
       window.dcv.setWorkerPath(fullWorkerPath);
       console.log('DCV worker path set to:', fullWorkerPath);
     }
-    
+
     if (window.dcv && window.dcv.setBaseUrl) {
       window.dcv.setBaseUrl(fullBaseUrl);
       console.log('DCV base URL set to:', fullBaseUrl);
     }
-    
+
     // Configure DCV similar to simple_browser_viewer.py
     const dcvConfig = {
       url: serverUrl,
@@ -174,35 +175,35 @@ const LiveBrowserViewer = ({ orderId }) => {
         }
       }
     };
-    
+
     console.log('DCV connect config:', dcvConfig);
-    
+
     window.dcv.connect(dcvConfig)
-    .then((conn) => {
-      console.log('Connection established');
-      connectionRef.current = conn;
-      setConnection(conn);
-      setSessionId(sessionId);
-      setAuthToken(authToken);
-      setAuthenticated(true);
-      setLoading(false);
-    })
-    .catch((error) => {
-      console.error('Connection failed:', error);
-      
-      // Handle connection limit reached error with retry
-      if (error.code === 12 || error.message?.includes('Connection limit reached')) {
-        setError('Connection limit reached. The DCV server has reached its maximum concurrent connections. Please try again in a few moments.');
-      } else {
-        setError(`Connection failed: ${error.message}`);
-      }
-      setLoading(false);
-    });
+      .then((conn) => {
+        console.log('Connection established');
+        connectionRef.current = conn;
+        setConnection(conn);
+        setSessionId(sessionId);
+        setAuthToken(authToken);
+        setAuthenticated(true);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Connection failed:', error);
+
+        // Handle connection limit reached error with retry
+        if (error.code === 12 || error.message?.includes('Connection limit reached')) {
+          setError('Connection limit reached. The DCV server has reached its maximum concurrent connections. Please try again in a few moments.');
+        } else {
+          setError(`Connection failed: ${error.message}`);
+        }
+        setLoading(false);
+      });
   }, []);
 
   const connectToSession = useCallback((serverUrl, sessionId, authToken) => {
     console.log('[LiveBrowserViewer] Connecting to session:', sessionId);
-    
+
     const connectOptions = {
       url: serverUrl,
       sessionId: sessionId,
@@ -220,20 +221,20 @@ const LiveBrowserViewer = ({ orderId }) => {
         displayLayout: (serverWidth, serverHeight, heads) => {
           console.log(`[LiveBrowserViewer] Display layout callback: ${serverWidth}x${serverHeight}`);
           const display = document.getElementById('dcv-display');
-          
+
           if (display) {
             // Let DCV SDK handle the sizing - just ensure container fills available space
             display.style.width = '100%';
             display.style.height = '100%';
             display.style.transform = 'none';
             display.style.transformOrigin = 'initial';
-            
+
             console.log(`[LiveBrowserViewer] Set display to fill container, server size: ${serverWidth}x${serverHeight}`);
           }
         },
         firstFrame: () => {
           console.log('[LiveBrowserViewer] First frame received!');
-          
+
           // Request display layout again after first frame
           if (connectionRef.current && connectionRef.current.requestDisplayLayout) {
             const resolutions = {
@@ -244,7 +245,7 @@ const LiveBrowserViewer = ({ orderId }) => {
             };
             const resolution = resolutions[currentResolution];
             console.log(`[LiveBrowserViewer] Requesting display layout after first frame: ${resolution.width}x${resolution.height}`);
-            
+
             setTimeout(() => {
               connectionRef.current.requestDisplayLayout([{
                 name: "Main Display",
@@ -266,15 +267,15 @@ const LiveBrowserViewer = ({ orderId }) => {
         }
       }
     };
-    
+
     console.log('[LiveBrowserViewer] Connect options:', connectOptions);
-    
+
     window.dcv.connect(connectOptions)
       .then(connection => {
         console.log('[LiveBrowserViewer] Connection established:', connection);
         connectionRef.current = connection;
         setConnection(connection);
-        
+
         // Request display layout based on current resolution - multiple attempts
         if (connection && connection.requestDisplayLayout) {
           const resolutions = {
@@ -285,7 +286,7 @@ const LiveBrowserViewer = ({ orderId }) => {
           };
           const resolution = resolutions[currentResolution];
           console.log(`[LiveBrowserViewer] Requesting initial display layout: ${resolution.width}x${resolution.height}`);
-          
+
           // Request immediately
           connection.requestDisplayLayout([{
             name: "Main Display",
@@ -297,7 +298,7 @@ const LiveBrowserViewer = ({ orderId }) => {
             },
             primary: true
           }]);
-          
+
           // Request again after a short delay
           setTimeout(() => {
             connection.requestDisplayLayout([{
@@ -311,7 +312,7 @@ const LiveBrowserViewer = ({ orderId }) => {
               primary: true
             }]);
           }, 500);
-          
+
           // And once more after 2 seconds
           setTimeout(() => {
             connection.requestDisplayLayout([{
@@ -336,13 +337,13 @@ const LiveBrowserViewer = ({ orderId }) => {
 
   const startAndConnect = useCallback(async () => {
     if (!orderId) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       // Get presigned URL following AWS tutorial pattern
-      const response = await fetch(`/api/orders/${orderId}/presigned-url`);
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/presigned-url`);
       if (!response.ok) {
         if (response.status === 503) {
           throw new Error('Live view not available - AgentCore session not active');
@@ -353,15 +354,15 @@ const LiveBrowserViewer = ({ orderId }) => {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
       }
-      
+
       const presignedData = await response.json();
       console.log('Presigned URL response:', presignedData);
-      
+
       // Check for errors
       if (presignedData.error || !presignedData.presignedUrl) {
         throw new Error(presignedData.error || 'No presigned URL available');
       }
-      
+
       // Check if this is development mode
       if (presignedData.development_mode || presignedData.presignedUrl?.includes('dcv-server.example.com')) {
         console.log('Development mode detected - using mock DCV connection');
@@ -382,18 +383,18 @@ const LiveBrowserViewer = ({ orderId }) => {
       }
 
       const { presignedUrl } = presignedData;
-      
+
       // Set log level for debugging
       if (window.dcv.setLogLevel && window.dcv.LogLevel) {
         window.dcv.setLogLevel(window.dcv.LogLevel.DEBUG);
         console.log('DCV log level set to DEBUG');
       }
-      
+
       // Follow simple_browser_viewer.py pattern: authenticate first, then connect
       console.log('Starting DCV authentication...');
-      
+
       let authSuccessful = false; // Flag to track successful authentication
-      
+
       authRef.current = window.dcv.authenticate(presignedUrl, {
         promptCredentials: (authType, callback) => {
           console.log('Credentials prompted:', authType);
@@ -406,9 +407,9 @@ const LiveBrowserViewer = ({ orderId }) => {
             console.log('Ignoring error callback after successful authentication:', error);
             return;
           }
-          
+
           console.error('Authentication failed:', error);
-          
+
           let errorMessage = 'Unknown authentication error';
           if (error) {
             if (error.message) {
@@ -419,35 +420,35 @@ const LiveBrowserViewer = ({ orderId }) => {
               errorMessage = error.toString();
             }
           }
-          
+
           setError(`Authentication failed: ${errorMessage}`);
           setLoading(false);
           authRef.current = null;
-          
+
           // Stop any further connection attempts
           return;
         },
         success: (auth, result) => {
           console.log('Authentication successful:', result);
           authSuccessful = true; // Mark authentication as successful
-          
+
           if (result && result[0]) {
             const { sessionId: authSessionId, authToken: authAuthToken } = result[0];
             console.log('Session ID:', authSessionId);
             console.log('Auth token received:', authAuthToken ? 'Yes' : 'No');
-            
+
             // First update UI state to render dcv-display element
             setSessionId(authSessionId);
             setAuthToken(authAuthToken);
             setAuthenticated(true);
             setLoading(false);
             setError(null);
-            
+
             // Then wait for DOM to update and connect
             setTimeout(() => {
               connectToSession(presignedUrl, authSessionId, authAuthToken);
             }, 100);
-            
+
           } else {
             console.error('No session data in auth result');
             setError('Authentication succeeded but no session data received');
@@ -460,7 +461,7 @@ const LiveBrowserViewer = ({ orderId }) => {
           return searchParams;
         }
       });
-      
+
     } catch (err) {
       console.error('Error starting DCV connection:', err);
       setError(`Failed to start connection: ${err.message}`);
@@ -479,7 +480,7 @@ const LiveBrowserViewer = ({ orderId }) => {
   useEffect(() => {
     return () => {
       console.log('LiveBrowserViewer unmounting - cleaning up connections');
-      
+
       // Close DCV connection
       if (connectionRef.current) {
         try {
@@ -490,7 +491,7 @@ const LiveBrowserViewer = ({ orderId }) => {
         }
         connectionRef.current = null;
       }
-      
+
       // Cancel authentication if in progress
       if (authRef.current) {
         try {
@@ -507,7 +508,7 @@ const LiveBrowserViewer = ({ orderId }) => {
   // Show error state
   if (error) {
     const isConnectionLimitError = error.includes('Connection limit reached');
-    
+
     return (
       <Container
         header={
@@ -520,8 +521,8 @@ const LiveBrowserViewer = ({ orderId }) => {
         }
       >
         <SpaceBetween direction="vertical" size="m">
-          <Alert 
-            type="error" 
+          <Alert
+            type="error"
             header="Connection Error"
             action={
               <Button
@@ -529,19 +530,19 @@ const LiveBrowserViewer = ({ orderId }) => {
                 onClick={async () => {
                   setLoading(true);
                   setError(null);
-                  
+
                   // If connection limit error, try to force disconnect existing sessions
                   if (isConnectionLimitError) {
                     try {
                       console.log('Attempting to force disconnect existing sessions...');
-                      const disconnectResponse = await fetch(`/api/orders/${orderId}/force-disconnect`, {
+                      const disconnectResponse = await fetch(`${API_BASE_URL}/api/orders/${orderId}/force-disconnect`, {
                         method: 'POST'
                       });
-                      
+
                       if (disconnectResponse.ok) {
                         const disconnectData = await disconnectResponse.json();
                         console.log('Force disconnect result:', disconnectData);
-                        
+
                         // Wait a moment for cleanup
                         await new Promise(resolve => setTimeout(resolve, 1000));
                       }
@@ -549,7 +550,7 @@ const LiveBrowserViewer = ({ orderId }) => {
                       console.warn('Failed to force disconnect:', disconnectError);
                     }
                   }
-                  
+
                   // Reset state and retry
                   setAuthenticated(false);
                   setConnection(null);
@@ -566,7 +567,7 @@ const LiveBrowserViewer = ({ orderId }) => {
             {isConnectionLimitError && (
               <Box margin={{ top: 's' }}>
                 <div style={{ fontSize: '14px', color: '#666' }}>
-                  This usually happens when multiple browser sessions are active. 
+                  This usually happens when multiple browser sessions are active.
                   Wait a moment and try again, or close other browser tabs with live views.
                 </div>
               </Box>
@@ -594,12 +595,12 @@ const LiveBrowserViewer = ({ orderId }) => {
           <StatusIndicator type="success">
             Connected to live view (Session: {sessionId ? sessionId.substring(0, 12) : 'Unknown'})
           </StatusIndicator>
-          
+
           {/* Resolution Control */}
           <Box>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
               gap: '15px',
               padding: '10px',
               backgroundColor: '#f9f9f9',
@@ -629,11 +630,11 @@ const LiveBrowserViewer = ({ orderId }) => {
                       if (resolution && connectionRef.current) {
                         console.log(`[LiveBrowserViewer] Changing resolution to: ${resolution.width}x${resolution.height}`);
                         setCurrentResolution(item.id);
-                        
+
                         try {
                           // First, change the actual browser resolution via backend API
                           console.log(`[LiveBrowserViewer] Calling backend API to change browser resolution...`);
-                          const response = await fetch(`/api/orders/${orderId}/change-resolution`, {
+                          const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/change-resolution`, {
                             method: 'POST',
                             headers: {
                               'Content-Type': 'application/json'
@@ -643,11 +644,11 @@ const LiveBrowserViewer = ({ orderId }) => {
                               height: resolution.height
                             })
                           });
-                          
+
                           if (response.ok) {
                             const result = await response.json();
                             console.log(`[LiveBrowserViewer] Browser resolution changed successfully:`, result);
-                            
+
                             // Wait a moment for the browser to resize
                             await new Promise(resolve => setTimeout(resolve, 1000));
                           } else {
@@ -657,7 +658,7 @@ const LiveBrowserViewer = ({ orderId }) => {
                         } catch (error) {
                           console.warn(`[LiveBrowserViewer] Error calling resolution API:`, error);
                         }
-                        
+
                         // Then, request new DCV display layout
                         connectionRef.current.requestDisplayLayout([{
                           name: "Main Display",
@@ -669,7 +670,7 @@ const LiveBrowserViewer = ({ orderId }) => {
                           },
                           primary: true
                         }]);
-                        
+
                         // Also update container size dynamically
                         const container = document.querySelector('[data-dcv-container]');
                         if (container) {
@@ -688,9 +689,9 @@ const LiveBrowserViewer = ({ orderId }) => {
                 ))}
               </div>
               <span style={{ fontSize: '12px', color: '#666', marginLeft: 'auto' }}>
-                Current: {currentResolution === '720p' ? '1280×720' : 
-                         currentResolution === '900p' ? '1600×900' : 
-                         currentResolution === '1080p' ? '1920×1080' : '2560×1440'}
+                Current: {currentResolution === '720p' ? '1280×720' :
+                  currentResolution === '900p' ? '1600×900' :
+                    currentResolution === '1080p' ? '1920×1080' : '2560×1440'}
               </span>
             </div>
           </Box>
