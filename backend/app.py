@@ -323,21 +323,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware - configure based on environment
-env_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
-default_origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://main.d1awa3ipd7jcr2.amplifyapp.com"
-]
-allowed_origins = list(set([o.strip() for o in env_origins + default_origins if o.strip()]))
-
+# CORS middleware - allow all origins for hackathon deployment
+# This ensures the Amplify frontend can always reach this backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
     max_age=3600,
 )
 
