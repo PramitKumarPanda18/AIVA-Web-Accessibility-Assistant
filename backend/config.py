@@ -69,6 +69,14 @@ class ConfigManager:
         self._config_cache = None
         self._cache_timestamp = 0
 
+    def _sanitize_region(self, region: str) -> str:
+        """Sanitize region string to standard AWS format (e.g., 'us-west-2')"""
+        if not region:
+            return self.DEFAULT_CONFIG["agentcore_region"]
+        
+        # Strip human-readable names like "us-west-2 (Oregon)" -> "us-west-2"
+        return region.split("(")[0].strip().lower()
+
     def get_system_config(self) -> Dict[str, Any]:
         """Get current system configuration from DB with fallback to defaults"""
         try:
@@ -78,6 +86,10 @@ class ConfigManager:
                 # Merge with defaults, ensuring all required keys exist
                 config = self.DEFAULT_CONFIG.copy()
                 config.update(stored_config)
+
+                # Sanitize the region string to ensure SDK compatibility
+                if "agentcore_region" in config:
+                    config["agentcore_region"] = self._sanitize_region(config["agentcore_region"])
 
                 # Ensure all required keys are present
                 for key in self.DEFAULT_CONFIG:
