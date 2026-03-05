@@ -147,7 +147,8 @@ class WebSocketService {
 
   connect() {
     try {
-      const wsProtocol = API_BASE_URL.startsWith('https') ? 'wss' : 'ws';
+      const isProd = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+      const wsProtocol = isProd ? 'wss' : (API_BASE_URL.startsWith('https') ? 'wss' : 'ws');
       const wsDomain = API_BASE_URL.replace(/^https?:\/\//, '');
       const wsUrl = `${wsProtocol}://${wsDomain}/ws`;
       this.ws = new WebSocket(wsUrl);
