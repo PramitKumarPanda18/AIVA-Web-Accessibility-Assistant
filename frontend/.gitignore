@@ -81,7 +81,7 @@ out
 
 # Gatsby
 .cache/
-public
+# public -- removed: React CRA needs public/index.html tracked
 
 # vuepress
 .vuepress/dist
