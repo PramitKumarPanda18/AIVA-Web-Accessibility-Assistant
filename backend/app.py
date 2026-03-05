@@ -33,6 +33,12 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from enum import Enum
 
+# --- GLOBALLY SANITIZE AWS_REGION ---
+# Render environment variables often have trailing spaces or human-readable formats 
+# like "us-west-2 (Oregon)", which immediately crashes all internal Boto3 SDK calls.
+if "AWS_REGION" in os.environ:
+    os.environ["AWS_REGION"] = os.environ["AWS_REGION"].split("(")[0].strip().lower()
+
 # Import our modules
 from database import (
     DatabaseManager,

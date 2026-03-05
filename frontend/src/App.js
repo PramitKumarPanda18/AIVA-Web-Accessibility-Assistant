@@ -21,6 +21,7 @@ import './App.css';
 import OrderDashboard from './components/OrderDashboard';
 // OrderHistory removed - functionality merged into OrderDashboard
 import Settings from './pages/Settings';
+import { API_BASE_URL } from './services/api';
 
 // Pages
 import ReviewQueue from './pages/ReviewQueue';
@@ -95,10 +96,10 @@ function AppContent() {
 
     const connectWebSocket = () => {
       try {
-        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-        const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
-        const wsDomain = apiUrl.replace(/^https?:\/\//, '');
-        const wsUrl = process.env.REACT_APP_WS_URL || `${wsProtocol}://${wsDomain}`;
+        const wsProtocol = API_BASE_URL.startsWith('https') ? 'wss' : 'ws';
+        const wsDomain = API_BASE_URL.replace(/^https?:\/\//, '');
+        const defaultWsUrl = `${wsProtocol}://${wsDomain}`;
+        const wsUrl = process.env.REACT_APP_WS_URL ? process.env.REACT_APP_WS_URL.trim() : defaultWsUrl;
         ws = new WebSocket(`${wsUrl}/ws`);
 
         ws.onopen = () => {
