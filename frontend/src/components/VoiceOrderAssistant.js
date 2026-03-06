@@ -161,14 +161,37 @@ const VoiceOrderAssistant = ({ visible, onDismiss, onOrderCreated }) => {
     };
 
     if (visible) {
-      webSpeechService.checkMicPermission().then(ok => {
-        setMicOk(ok);
-        if (ok) {
-          startConversation();
-        } else {
-          setError('Microphone access denied. Please click the camera/mic icon in the browser address bar and allow microphone access, then restart.');
+      const initVoice = async () => {
+        // Start checking permission and initializing backend in parallel
+        const micPromise = webSpeechService.checkMicPermission();
+        const convPromise = webSpeechService.startConversation();
+
+        try {
+          const micOk = await micPromise;
+          setMicOk(micOk);
+
+          if (micOk) {
+            const result = await convPromise;
+            const greeting = result.text || result.assistant_text || '';
+            if (greeting) {
+              setConversationHistory([{
+                role: 'assistant',
+                text: greeting,
+                timestamp: new Date().toISOString()
+              }]);
+            }
+          } else {
+            setError('Microphone access denied. Please click the camera/mic icon in the browser address bar and allow access, then restart.');
+          }
+        } catch (err) {
+          console.error('Initialization error:', err);
+          setError('Communication error. Verify your connection.');
+        } finally {
+          setIsProcessing(false);
         }
-      });
+      };
+
+      initVoice();
     }
     return () => {
       webSpeechService._onSpeakingStateChange = null;

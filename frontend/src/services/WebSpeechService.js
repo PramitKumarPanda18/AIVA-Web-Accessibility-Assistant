@@ -150,13 +150,20 @@ class WebSpeechService {
             if (event.error === 'aborted') return; // Ignore — we handle in onend
             if (event.error === 'no-speech') {
                 const listenDuration = Date.now() - this._listenStartTime;
-                console.log(`[Voice] no-speech after ${listenDuration}ms`);
+                console.log(`[Voice] no-speech after ${listenDuration}ms. Transcript: ${this._lastTranscript}`);
+
+                // If we have ANY transcript, "no-speech" just means the user finished talking
+                if (this._lastTranscript && this._lastTranscript.length > 0) {
+                    console.log('[Voice] Success capture despite no-speech error');
+                    this._finishWithTranscript();
+                    return;
+                }
 
                 if (listenDuration < 1500 && !this._retryInProgress) {
                     console.log('[Voice] Premature no-speech — attempting single silent restart');
                     this._retryInProgress = true;
                     try { this.recognition.stop(); } catch (e) { }
-                    return; // onend will handle the restart
+                    return;
                 }
 
                 this._clearTimers();
@@ -225,9 +232,14 @@ class WebSpeechService {
 
             // Reset silence timer every time we get speech
             if (this._silenceTimer) clearTimeout(this._silenceTimer);
+
+            // MOBILE: If we get a valid final transcript, we've heard them!
+            if (finalTranscript.trim().length > 3) {
+                console.log('[Voice] Strong capture detected:', finalTranscript.trim());
+            }
+
             this._silenceTimer = setTimeout(() => {
                 // 3.0 seconds of silence after last speech → auto-send
-                // Increased to 3s for mobile stability (OnePlus / Android)
                 console.log('[Voice] Silence detected — auto-sending');
                 this._finishWithTranscript();
             }, 3000);
