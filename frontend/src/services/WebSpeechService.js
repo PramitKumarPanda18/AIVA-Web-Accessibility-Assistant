@@ -163,11 +163,14 @@ class WebSpeechService {
             }
         };
 
-        this.isListening = false;
-        // If we haven't sent yet, try to send what we have
-        if (!this._sent) {
-            this._finishWithTranscript();
-        }
+        this.recognition.onend = () => {
+            console.log('[Voice] Recognition ended.');
+            this.isListening = false;
+            // Only auto-finish if we haven't sent yet
+            if (!this._sent) {
+                this._finishWithTranscript();
+            }
+        };
 
         this.recognition.onresult = (event) => {
             let finalTranscript = '';
