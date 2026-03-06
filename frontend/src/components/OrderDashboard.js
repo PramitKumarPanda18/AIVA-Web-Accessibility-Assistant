@@ -217,7 +217,7 @@ const OrderDashboard = ({ addNotification }) => {
     }
 
     try {
-      const response = await fetch(`/api/orders/${orderId}/force`, { method: 'DELETE' });
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/force`, { method: 'DELETE' });
 
       if (!response.ok) {
         throw new Error('Failed to delete order');
@@ -248,7 +248,7 @@ const OrderDashboard = ({ addNotification }) => {
 
   const handleRetryOrder = async (orderId) => {
     try {
-      const response = await fetch(`/api/orders/${orderId}/retry`, { method: 'POST' });
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/retry`, { method: 'POST' });
       if (response.ok) {
         addNotification({
           type: 'success',
@@ -275,7 +275,7 @@ const OrderDashboard = ({ addNotification }) => {
       const cancelPromises = selectedItems
         .filter(order => order.status === 'pending')
         .map(order =>
-          fetch(`/api/orders/${order.id}/cancel`, { method: 'POST' })
+          fetch(`${API_BASE_URL}/api/orders/${order.id}/cancel`, { method: 'POST' })
         );
 
       await Promise.all(cancelPromises);
@@ -311,7 +311,7 @@ const OrderDashboard = ({ addNotification }) => {
 
     try {
       const deletePromises = selectedItems.map(order =>
-        fetch(`/api/orders/${order.id}/force`, { method: 'DELETE' })
+        fetch(`${API_BASE_URL}/api/orders/${order.id}/force`, { method: 'DELETE' })
       );
 
       await Promise.all(deletePromises);

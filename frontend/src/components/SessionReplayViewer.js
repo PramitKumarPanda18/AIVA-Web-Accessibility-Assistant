@@ -10,6 +10,7 @@ import {
   Alert,
   KeyValuePairs
 } from '@cloudscape-design/components';
+import { API_BASE_URL } from '../services/api';
 
 const SessionReplayViewer = ({ order, isVisible, onClose }) => {
   const [replayInfo, setReplayInfo] = useState(null);
@@ -19,32 +20,32 @@ const SessionReplayViewer = ({ order, isVisible, onClose }) => {
 
   const fetchReplayInfo = useCallback(async () => {
     if (!order?.id) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       // Try the new detailed status endpoint first
-      let response = await fetch(`/api/orders/${order.id}/session-replay/status`);
-      
+      let response = await fetch(`${API_BASE_URL}/api/orders/${order.id}/session-replay/status`);
+
       if (!response.ok) {
         // Fallback to the original endpoint
-        response = await fetch(`/api/orders/${order.id}/session-replay`);
-        
+        response = await fetch(`${API_BASE_URL}/api/orders/${order.id}/session-replay`);
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.detail || 'Session replay not available');
         }
       }
-      
+
       const data = await response.json();
-      
+
       if (!data.replay_available) {
         throw new Error(data.reason || 'Session replay not available for this order');
       }
-      
+
       setReplayInfo(data);
-      
+
     } catch (err) {
       console.error('Failed to fetch session replay info:', err);
       setError(err.message);
@@ -87,7 +88,7 @@ Setup Instructions:
 
 Documentation: ${replayInfo.documentation_url || 'https://docs.aws.amazon.com/bedrock/latest/userguide/agentcore-browser-observability.html'}
       `;
-      
+
       navigator.clipboard.writeText(instructions.trim());
       console.log('Session replay CLI commands copied to clipboard!');
     } else if (replayInfo?.s3_bucket && replayInfo?.s3_prefix) {
@@ -102,7 +103,7 @@ python view_recordings.py --bucket ${replayInfo.s3_bucket} --prefix ${replayInfo
 View Latest Recording:
 python view_recordings.py --bucket ${replayInfo.s3_bucket} --prefix ${replayInfo.s3_prefix}
       `;
-      
+
       navigator.clipboard.writeText(instructions.trim());
       console.log('Session replay CLI commands copied to clipboard!');
     }
@@ -120,13 +121,13 @@ python view_recordings.py --bucket ${replayInfo.s3_bucket} --prefix ${replayInfo
       footer={
         <Box float="right">
           <SpaceBetween direction="horizontal" size="xs">
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               onClick={onClose}
             >
               Close
             </Button>
-            <Button 
+            <Button
               onClick={handleRefresh}
               disabled={loading}
               iconName="refresh"
@@ -134,8 +135,8 @@ python view_recordings.py --bucket ${replayInfo.s3_bucket} --prefix ${replayInfo
               Refresh
             </Button>
             {replayInfo && (
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 onClick={openReplayInNewTab}
                 iconName="external"
               >
@@ -221,12 +222,12 @@ python view_recordings.py --bucket ${replayInfo.s3_bucket} --prefix ${replayInfo
                   </Alert>
 
                   {/* Embedded replay viewer placeholder */}
-                  <Box 
-                    padding="xl" 
-                    backgroundColor="grey-50" 
+                  <Box
+                    padding="xl"
+                    backgroundColor="grey-50"
                     textAlign="center"
-                    style={{ 
-                      border: '2px dashed #d1d5db', 
+                    style={{
+                      border: '2px dashed #d1d5db',
                       borderRadius: '8px',
                       minHeight: '400px',
                       display: 'flex',
@@ -243,14 +244,14 @@ python view_recordings.py --bucket ${replayInfo.s3_bucket} --prefix ${replayInfo
                         Session replay data is stored in S3 and can be viewed using the AgentCore SDK tools.
                       </Box>
                       <SpaceBetween direction="horizontal" size="s">
-                        <Button 
-                          variant="primary" 
+                        <Button
+                          variant="primary"
                           onClick={openReplayInNewTab}
                           iconName="copy"
                         >
                           Copy CLI Commands
                         </Button>
-                        <Button 
+                        <Button
                           variant="normal"
                           iconName="external"
                           onClick={() => window.open('https://docs.aws.amazon.com/bedrock/latest/userguide/agentcore-browser-observability.html', '_blank')}
@@ -268,11 +269,11 @@ python view_recordings.py --bucket ${replayInfo.s3_bucket} --prefix ${replayInfo
                   <Box variant="p">
                     Use these commands with the Amazon Bedrock AgentCore SDK to view the session replay:
                   </Box>
-                  
+
                   <Box variant="h4">View Specific Session</Box>
                   <Box fontFamily="monospace" padding="s" backgroundColor="grey-100" style={{ borderRadius: '4px' }}>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontSize: '12px' }}>
-{`python view_recordings.py \\
+                      {`python view_recordings.py \\
   --bucket ${replayInfo.s3_bucket} \\
   --prefix ${replayInfo.s3_prefix} \\
   --session ${replayInfo.session_id}`}
@@ -282,7 +283,7 @@ python view_recordings.py --bucket ${replayInfo.s3_bucket} --prefix ${replayInfo
                   <Box variant="h4">View Latest Recording</Box>
                   <Box fontFamily="monospace" padding="s" backgroundColor="grey-100" style={{ borderRadius: '4px' }}>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontSize: '12px' }}>
-{`python view_recordings.py \\
+                      {`python view_recordings.py \\
   --bucket ${replayInfo.s3_bucket} \\
   --prefix ${replayInfo.s3_prefix}`}
                     </pre>
@@ -291,7 +292,7 @@ python view_recordings.py --bucket ${replayInfo.s3_bucket} --prefix ${replayInfo
                   <Box variant="h4">Interactive Browser Session</Box>
                   <Box fontFamily="monospace" padding="s" backgroundColor="grey-100" style={{ borderRadius: '4px' }}>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontSize: '12px' }}>
-{`python -m live_view_sessionreplay.browser_interactive_session`}
+                      {`python -m live_view_sessionreplay.browser_interactive_session`}
                     </pre>
                   </Box>
 
