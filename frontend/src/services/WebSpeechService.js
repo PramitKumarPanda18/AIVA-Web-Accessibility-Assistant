@@ -42,6 +42,8 @@ class WebSpeechService {
         this._lastTranscript = '';
         this._sent = false;
         this._onSpeakingStateChange = null;
+        this._listenStartTime = 0;
+        this._retryInProgress = false;
     }
 
     isSupported() {
@@ -128,6 +130,8 @@ class WebSpeechService {
         this._sent = false;
         this._isProcessing = false;
         this._noSpeechRetries = 0;
+        this._listenStartTime = Date.now();
+        this._retryInProgress = false;
         this.isListening = true;
 
         // 20-second absolute safety timeout
@@ -145,7 +149,16 @@ class WebSpeechService {
             console.error('[Voice] Recognition error:', event.error);
             if (event.error === 'aborted') return; // Ignore — we handle in onend
             if (event.error === 'no-speech') {
-                console.log('[Voice] no-speech detected — stopping to avoid flicker');
+                const listenDuration = Date.now() - this._listenStartTime;
+                console.log(`[Voice] no-speech after ${listenDuration}ms`);
+
+                if (listenDuration < 1500 && !this._retryInProgress) {
+                    console.log('[Voice] Premature no-speech — attempting single silent restart');
+                    this._retryInProgress = true;
+                    try { this.recognition.stop(); } catch (e) { }
+                    return; // onend will handle the restart
+                }
+
                 this._clearTimers();
                 this.isListening = false;
                 if (!this._sent) {
@@ -165,6 +178,25 @@ class WebSpeechService {
 
         this.recognition.onend = () => {
             console.log('[Voice] Recognition ended.');
+
+            if (this._retryInProgress && !this._sent) {
+                this._retryInProgress = false;
+                this._listenStartTime = Date.now(); // Reset start time
+                setTimeout(() => {
+                    try {
+                        if (!this._sent) {
+                            console.log('[Voice] Silently restarting...');
+                            this.recognition.start();
+                        }
+                    } catch (e) {
+                        console.error('[Voice] Silent restart failed:', e);
+                        this.isListening = false;
+                        this._finishWithTranscript();
+                    }
+                }, 400); // 400ms delay to prevent flicker toast on mobile
+                return;
+            }
+
             this.isListening = false;
             // Only auto-finish if we haven't sent yet
             if (!this._sent) {
