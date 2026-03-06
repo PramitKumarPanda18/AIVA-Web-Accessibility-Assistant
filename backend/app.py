@@ -36,8 +36,12 @@ from enum import Enum
 # --- GLOBALLY SANITIZE AWS_REGION ---
 # Render environment variables often have trailing spaces or human-readable formats 
 # like "us-west-2 (Oregon)", which immediately crashes all internal Boto3 SDK calls.
-if "AWS_REGION" in os.environ:
-    os.environ["AWS_REGION"] = os.environ["AWS_REGION"].split("(")[0].strip().lower()
+for env_var in ["AWS_REGION", "AWS_DEFAULT_REGION", "AGENTCORE_REGION"]:
+    if env_var in os.environ:
+        clean_val = os.environ[env_var].split("(")[0].strip().lower()
+        if clean_val != os.environ[env_var]:
+            print(f"INFO: Sanitizing {env_var}: '{os.environ[env_var]}' -> '{clean_val}'")
+            os.environ[env_var] = clean_val
 
 # Import our modules
 from database import (

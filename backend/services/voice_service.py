@@ -1413,6 +1413,10 @@ def get_voice_service(
         voice_model = voice_model or env_model
         voice_config = voice_config or {}
     
+    # Sanitize region format (e.g. "us-west-2 (Oregon)" -> "us-west-2")
+    if region:
+        region = region.split("(")[0].strip().lower()
+    
     logger.info(f"get_voice_service: using model={voice_model}, region={region}")
 
     if _voice_service_instance is None:

@@ -1445,10 +1445,24 @@ class DatabaseManager:
         try:
             # Default retailers to ensure exist
             defaults = [
-                RetailerUrlModel(retailer_name="Amazon", login_url="https://www.amazon.com/gp/sign-in.html", cart_url="https://www.amazon.com/gp/cart/view.html"),
-                RetailerUrlModel(retailer_name="Walmart", login_url="https://www.walmart.com/account/login", cart_url="https://www.walmart.com/cart"),
-                RetailerUrlModel(retailer_name="Target", login_url="https://www.target.com/login", cart_url="https://www.target.com/co-cart"),
-                RetailerUrlModel(retailer_name="Costco", login_url="https://www.costco.com/LogonForm", cart_url="https://www.costco.com/CheckoutCartView"),
+                RetailerUrlModel(
+                    retailer="Amazon", 
+                    website_name="Amazon US", 
+                    starting_url="https://www.amazon.com",
+                    is_default=True
+                ),
+                RetailerUrlModel(
+                    retailer="Amazon Fresh", 
+                    website_name="Amazon Fresh US", 
+                    starting_url="https://www.amazon.com/fresh",
+                    is_default=True
+                ),
+                RetailerUrlModel(
+                    retailer="Walmart", 
+                    website_name="Walmart US", 
+                    starting_url="https://www.walmart.com",
+                    is_default=True
+                ),
             ]
             
             session = self.SessionLocal()
@@ -1456,7 +1470,7 @@ class DatabaseManager:
                 # Check and add each default retailer if not exists
                 count = 0
                 for default_retailer in defaults:
-                    existing = session.query(RetailerUrlModel).filter_by(retailer_name=default_retailer.retailer_name).first()
+                    existing = session.query(RetailerUrlModel).filter_by(retailer=default_retailer.retailer).first()
                     if not existing:
                         session.add(default_retailer)
                         count += 1
