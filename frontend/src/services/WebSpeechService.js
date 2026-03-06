@@ -145,25 +145,7 @@ class WebSpeechService {
             console.error('[Voice] Recognition error:', event.error);
             if (event.error === 'aborted') return; // Ignore — we handle in onend
             if (event.error === 'no-speech') {
-                // Chrome fires 'no-speech' after ~5s even with continuous=true.
-                // Auto-retry up to 5 times (= ~25 seconds of listening window).
-                this._noSpeechRetries++;
-                console.log(`[Voice] no-speech retry ${this._noSpeechRetries}/5`);
-                if (this._noSpeechRetries < 5 && !this._sent) {
-                    // Restart recognition silently — don't show error yet
-                    try {
-                        this.recognition.stop();
-                    } catch (e) { }
-                    setTimeout(() => {
-                        if (!this._sent) {
-                            try { this.recognition.start(); } catch (e) {
-                                console.error('[Voice] Restart failed:', e);
-                            }
-                        }
-                    }, 100);
-                    return;
-                }
-                // All retries exhausted
+                console.log('[Voice] no-speech detected — stopping to avoid flicker');
                 this._clearTimers();
                 this.isListening = false;
                 if (!this._sent) {
@@ -181,30 +163,11 @@ class WebSpeechService {
             }
         };
 
-        this.recognition.onend = () => {
-            console.log('[Voice] Recognition ended. Transcript:', this._lastTranscript);
-            // If recognition ended but we haven't sent yet and have retries left,
-            // auto-restart to keep listening.
-            if (!this._sent && !this._lastTranscript && this._noSpeechRetries < 5) {
-                console.log('[Voice] Auto-restarting recognition after onend...');
-                this._noSpeechRetries++;
-                setTimeout(() => {
-                    if (!this._sent) {
-                        try { this.recognition.start(); } catch (e) {
-                            console.error('[Voice] Restart failed:', e);
-                            this.isListening = false;
-                            this._finishWithTranscript();
-                        }
-                    }
-                }, 100);
-                return;
-            }
-            this.isListening = false;
-            // If we haven't sent yet, try to send what we have
-            if (!this._sent) {
-                this._finishWithTranscript();
-            }
-        };
+        this.isListening = false;
+        // If we haven't sent yet, try to send what we have
+        if (!this._sent) {
+            this._finishWithTranscript();
+        }
 
         this.recognition.onresult = (event) => {
             let finalTranscript = '';
@@ -228,10 +191,11 @@ class WebSpeechService {
             // Reset silence timer every time we get speech
             if (this._silenceTimer) clearTimeout(this._silenceTimer);
             this._silenceTimer = setTimeout(() => {
-                // 2.5 seconds of silence after last speech → auto-send
+                // 3.0 seconds of silence after last speech → auto-send
+                // Increased to 3s for mobile stability (OnePlus / Android)
                 console.log('[Voice] Silence detected — auto-sending');
                 this._finishWithTranscript();
-            }, 2500);
+            }, 3000);
         };
 
         try {
