@@ -38,10 +38,18 @@ from enum import Enum
 # like "us-west-2 (Oregon)", which immediately crashes all internal Boto3 SDK calls.
 for env_var in ["AWS_REGION", "AWS_DEFAULT_REGION", "AGENTCORE_REGION"]:
     if env_var in os.environ:
-        clean_val = os.environ[env_var].split("(")[0].strip().lower()
-        if clean_val != os.environ[env_var]:
-            print(f"INFO: Sanitizing {env_var}: '{os.environ[env_var]}' -> '{clean_val}'")
+        val = os.environ[env_var]
+        clean_val = val.split("(")[0].strip().lower()
+        if clean_val != val:
+            print(f"INFO: Sanitizing {env_var}: '{val}' -> '{clean_val}'")
             os.environ[env_var] = clean_val
+
+# Force-set common AWS environment variables to match sanitized version
+if os.environ.get("AWS_REGION"):
+    os.environ["AWS_DEFAULT_REGION"] = os.environ["AWS_REGION"]
+
+# Diagnostic: Verify region on boot
+print(f"DEBUG: Active AWS_REGION: {os.environ.get('AWS_REGION')}")
 
 # Import our modules
 from database import (

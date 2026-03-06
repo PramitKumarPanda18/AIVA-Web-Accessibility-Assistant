@@ -490,7 +490,26 @@ class DatabaseManager:
                 except Exception as e:
                     logger.warning(f"Failed to update automation method values: {e}")
 
-                # Migration 3: Initialize default retailer URLs
+                # Migration 3: Column Renaming for retailer_urls
+                if self.use_postgres:
+                    try:
+                        # Check if old column 'retailer_name' exists
+                        check_res = session.execute(text(
+                            "SELECT column_name FROM information_schema.columns "
+                            "WHERE table_name='retailer_urls' AND column_name='retailer_name'"
+                        )).fetchone()
+                        
+                        if check_res:
+                            logger.info("Migrating legacy 'retailer_name' to 'retailer' in retailer_urls")
+                            session.execute(text("ALTER TABLE retailer_urls RENAME COLUMN retailer_name TO retailer"))
+                            session.execute(text("ALTER TABLE retailer_urls RENAME COLUMN login_url TO starting_url"))
+                            session.execute(text("ALTER TABLE retailer_urls RENAME COLUMN cart_url TO website_name")) # Temporary map
+                            session.commit()
+                    except Exception as migrate_e:
+                        logger.warning(f"Postgres column migration skipped: {migrate_e}")
+                        session.rollback()
+
+                # Migration 4: Initialize default retailer URLs
                 try:
                     self.initialize_default_retailer_urls()
                 except Exception as e:
