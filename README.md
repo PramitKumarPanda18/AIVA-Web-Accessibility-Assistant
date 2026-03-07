@@ -9,6 +9,17 @@ AIVA (AI-Integrated Voice Assistant) is a production-ready, AI-powered e-commerc
 
 ---
 
+## 🚀 Live Experience
+
+Experience the future of accessible shopping on the live production environment. Our platform uses a **Hybrid Cloud Architecture**, combining the scalability of **AWS Amplify** with the automation power of **Render**.
+
+### 🔗 **[Launch AIVA Platform](https://main.d1awa3ipd7jcr2.amplifyapp.com/)**
+
+> [!TIP]
+> **No Login Required:** For the AI Bharat Hackathon, we have enabled a **Shared Mission Control** mode. You can start creating voice orders and watching the AI work instantly without setting up an account!
+
+---
+
 ## 🌟 Key Features
 
 ### 🤖 Multiple AI Automation Methods
